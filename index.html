@@ -1,0 +1,2138 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="고급스러운 다크 테마의 프리미엄 로또 번호 추첨 시뮬레이터입니다. 꿈 해몽 키워드 추출, 고정수/제외수 필터 설정 및 실시간 통계 분석 기능을 제공합니다." />
+  <title>LUCKY 6/45 - 프리미엄 로또 번호 추첨 시뮬레이터</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap');
+
+    :root {
+      --bg-primary: #0b0f19;
+      --bg-secondary: #161e31;
+      --glass-bg: rgba(22, 30, 49, 0.65);
+      --glass-border: rgba(255, 255, 255, 0.08);
+      --glass-glow: rgba(99, 102, 241, 0.12);
+      
+      --color-primary: #6366f1;
+      --color-primary-hover: #4f46e5;
+      --color-primary-glow: rgba(99, 102, 241, 0.4);
+      --color-accent: #22d3ee;
+      --color-accent-glow: rgba(34, 211, 238, 0.4);
+      --color-success: #10b981;
+      --color-danger: #ef4444;
+      
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      
+      /* Lotto ball color definitions */
+      --ball-y-1: #facc15; --ball-y-2: #ca8a04; --ball-y-shadow: rgba(234, 179, 8, 0.4);
+      --ball-b-1: #38bdf8; --ball-b-2: #0284c7; --ball-b-shadow: rgba(14, 165, 233, 0.4);
+      --ball-r-1: #f87171; --ball-r-2: #dc2626; --ball-r-shadow: rgba(239, 68, 68, 0.4);
+      --ball-g-1: #94a3b8; --ball-g-2: #475569; --ball-g-shadow: rgba(100, 116, 139, 0.4);
+      --ball-gr-1: #4ade80; --ball-gr-2: #16a34a; --ball-gr-shadow: rgba(34, 197, 94, 0.4);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg-primary);
+      color: var(--text-main);
+      font-family: 'Outfit', 'Noto Sans KR', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px;
+    }
+
+    /* Floating glowing background elements */
+    .stars-bg {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background-image: 
+        radial-gradient(white, rgba(255,255,255,.15) 1.5px, transparent 40px),
+        radial-gradient(white, rgba(255,255,255,.1) 1px, transparent 30px);
+      background-size: 500px 500px, 350px 350px;
+      background-position: 0 0, 40px 60px;
+      opacity: 0.12;
+      z-index: -2;
+      pointer-events: none;
+    }
+
+    .glow-orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(140px);
+      z-index: -1;
+      pointer-events: none;
+      opacity: 0.55;
+      animation: orbFloat 22s infinite alternate ease-in-out;
+    }
+
+    .orb-1 {
+      width: 450px;
+      height: 450px;
+      background: radial-gradient(circle, rgba(99, 102, 241, 0.22) 0%, rgba(99, 102, 241, 0) 70%);
+      top: -120px;
+      left: -120px;
+    }
+
+    .orb-2 {
+      width: 550px;
+      height: 550px;
+      background: radial-gradient(circle, rgba(236, 72, 153, 0.18) 0%, rgba(236, 72, 153, 0) 70%);
+      bottom: -150px;
+      right: -120px;
+      animation-delay: -5s;
+    }
+
+    .orb-3 {
+      width: 380px;
+      height: 380px;
+      background: radial-gradient(circle, rgba(34, 211, 238, 0.16) 0%, rgba(34, 211, 238, 0) 70%);
+      top: 35%;
+      right: 10%;
+      animation-delay: -10s;
+    }
+
+    @keyframes orbFloat {
+      0% { transform: translate(0, 0) scale(1); }
+      100% { transform: translate(45px, 60px) scale(1.12); }
+    }
+
+    /* Core container layout */
+    .app-container {
+      width: 100%;
+      max-width: 1120px;
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+      z-index: 1;
+    }
+
+    /* Header styling */
+    .app-header {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    .logo-icon {
+      font-size: 2.4rem;
+      filter: drop-shadow(0 0 10px var(--color-primary-glow));
+      animation: bounce 3s infinite ease-in-out;
+    }
+
+    .app-header h1 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      letter-spacing: 2px;
+      background: linear-gradient(135deg, #ffffff 30%, #a5b4fc 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    }
+
+    .subtitle {
+      font-size: 1rem;
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+
+    /* Layout grid */
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1.25fr 0.95fr;
+      gap: 28px;
+    }
+
+    @media (max-width: 900px) {
+      .main-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Card styling (Glassmorphism) */
+    .card {
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      border-radius: 24px;
+      padding: 28px;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.35), inset 0 0 1px rgba(255,255,255,0.1);
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      padding-bottom: 14px;
+    }
+
+    .card-header h2 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .badge {
+      background: rgba(99, 102, 241, 0.15);
+      border: 1px solid var(--color-primary-glow);
+      color: #a5b4fc;
+      padding: 4px 10px;
+      border-radius: 99px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    /* Drawing Station details */
+    .drawing-station {
+      justify-content: space-between;
+    }
+
+    /* Lottery Cage visual setup */
+    .cage-wrapper {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 10px 0;
+    }
+
+    .lottery-cage {
+      position: relative;
+      width: 220px;
+      height: 220px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, rgba(30, 41, 59, 0.35) 0%, rgba(15, 23, 42, 0.85) 100%);
+      border: 6px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 
+        0 15px 30px rgba(0,0,0,0.4), 
+        inset 0 0 25px rgba(99, 102, 241, 0.12),
+        inset 0 0 15px rgba(255, 255, 255, 0.05);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      z-index: 2;
+    }
+
+    .lottery-cage.spinning {
+      border-color: rgba(99, 102, 241, 0.45);
+      box-shadow: 
+        0 15px 30px rgba(0,0,0,0.4), 
+        0 0 25px rgba(99, 102, 241, 0.35),
+        inset 0 0 35px rgba(99, 102, 241, 0.25);
+      animation: cageShake 0.15s infinite;
+    }
+
+    .cage-glass {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      border-radius: 50%;
+      background: linear-gradient(135deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0) 50%, rgba(0,0,0,0.25) 100%);
+      pointer-events: none;
+      z-index: 5;
+    }
+
+    .cage-balls-container {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0; left: 0;
+      z-index: 1;
+    }
+
+    .cage-center-spinner {
+      position: absolute;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 2px dashed rgba(255, 255, 255, 0.12);
+      background: rgba(15, 23, 42, 0.7);
+      z-index: 3;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .cage-center-spinner::before {
+      content: '🍀';
+      font-size: 14px;
+      opacity: 0.65;
+      animation: spinnerRotate 6s infinite linear;
+    }
+
+    .spinning .cage-center-spinner::before {
+      animation: spinnerRotate 0.6s infinite linear;
+    }
+
+    .cage-pedestal {
+      width: 130px;
+      height: 22px;
+      background: linear-gradient(90deg, #1e293b, #334155, #1e293b);
+      margin: -6px auto 0;
+      border-radius: 6px;
+      border: 1px solid rgba(255,255,255,0.06);
+      box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Small balls inside the cage */
+    .cage-ball {
+      position: absolute;
+      width: 15px;
+      height: 15px;
+      border-radius: 50%;
+      box-shadow: inset -2px -2px 3px rgba(0,0,0,0.4), inset 1px 1px 2px rgba(255,255,255,0.25);
+      transition: transform 0.25s ease-out;
+    }
+
+    /* Positions for 15 decorative mini balls inside cage */
+    .cage-ball:nth-child(1) { left: 45px; top: 60px; background: radial-gradient(circle at 30% 30%, var(--ball-y-1), var(--ball-y-2)); }
+    .cage-ball:nth-child(2) { left: 75px; top: 45px; background: radial-gradient(circle at 30% 30%, var(--ball-b-1), var(--ball-b-2)); }
+    .cage-ball:nth-child(3) { left: 105px; top: 55px; background: radial-gradient(circle at 30% 30%, var(--ball-r-1), var(--ball-r-2)); }
+    .cage-ball:nth-child(4) { left: 135px; top: 75px; background: radial-gradient(circle at 30% 30%, var(--ball-g-1), var(--ball-g-2)); }
+    .cage-ball:nth-child(5) { left: 155px; top: 100px; background: radial-gradient(circle at 30% 30%, var(--ball-gr-1), var(--ball-gr-2)); }
+    .cage-ball:nth-child(6) { left: 50px; top: 125px; background: radial-gradient(circle at 30% 30%, var(--ball-y-1), var(--ball-y-2)); }
+    .cage-ball:nth-child(7) { left: 80px; top: 145px; background: radial-gradient(circle at 30% 30%, var(--ball-b-1), var(--ball-b-2)); }
+    .cage-ball:nth-child(8) { left: 115px; top: 135px; background: radial-gradient(circle at 30% 30%, var(--ball-r-1), var(--ball-r-2)); }
+    .cage-ball:nth-child(9) { left: 145px; top: 120px; background: radial-gradient(circle at 30% 30%, var(--ball-g-1), var(--ball-g-2)); }
+    .cage-ball:nth-child(10) { left: 65px; top: 95px; background: radial-gradient(circle at 30% 30%, var(--ball-gr-1), var(--ball-gr-2)); }
+    .cage-ball:nth-child(11) { left: 95px; top: 100px; background: radial-gradient(circle at 30% 30%, var(--ball-y-1), var(--ball-y-2)); }
+    .cage-ball:nth-child(12) { left: 125px; top: 95px; background: radial-gradient(circle at 30% 30%, var(--ball-b-1), var(--ball-b-2)); }
+    .cage-ball:nth-child(13) { left: 80px; top: 75px; background: radial-gradient(circle at 30% 30%, var(--ball-r-1), var(--ball-r-2)); }
+    .cage-ball:nth-child(14) { left: 110px; top: 80px; background: radial-gradient(circle at 30% 30%, var(--ball-g-1), var(--ball-g-2)); }
+    .cage-ball:nth-child(15) { left: 120px; top: 115px; background: radial-gradient(circle at 30% 30%, var(--ball-gr-1), var(--ball-gr-2)); }
+
+    /* Bouncing animations for spinning state */
+    .spinning .cage-ball:nth-child(1) { animation: ballSpin1 0.7s infinite linear; }
+    .spinning .cage-ball:nth-child(2) { animation: ballSpin2 0.6s infinite linear; }
+    .spinning .cage-ball:nth-child(3) { animation: ballSpin3 0.8s infinite linear; }
+    .spinning .cage-ball:nth-child(4) { animation: ballSpin4 0.55s infinite linear; }
+    .spinning .cage-ball:nth-child(5) { animation: ballSpin5 0.72s infinite linear; }
+    .spinning .cage-ball:nth-child(6) { animation: ballSpin6 0.68s infinite linear; }
+    .spinning .cage-ball:nth-child(7) { animation: ballSpin7 0.78s infinite linear; }
+    .spinning .cage-ball:nth-child(8) { animation: ballSpin8 0.62s infinite linear; }
+    .spinning .cage-ball:nth-child(9) { animation: ballSpin9 0.65s infinite linear; }
+    .spinning .cage-ball:nth-child(10) { animation: ballSpin10 0.82s infinite linear; }
+    .spinning .cage-ball:nth-child(11) { animation: ballSpin1 0.63s infinite linear reverse; }
+    .spinning .cage-ball:nth-child(12) { animation: ballSpin2 0.73s infinite linear reverse; }
+    .spinning .cage-ball:nth-child(13) { animation: ballSpin3 0.83s infinite linear reverse; }
+    .spinning .cage-ball:nth-child(14) { animation: ballSpin4 0.53s infinite linear reverse; }
+    .spinning .cage-ball:nth-child(15) { animation: ballSpin5 0.68s infinite linear reverse; }
+
+    @keyframes cageShake {
+      0% { transform: translate(0, 0) rotate(0deg); }
+      20% { transform: translate(-1.5px, 2px) rotate(-0.5deg); }
+      40% { transform: translate(2px, -1px) rotate(1deg); }
+      60% { transform: translate(-2px, -1.5px) rotate(-1deg); }
+      80% { transform: translate(1.5px, 1.5px) rotate(0.5deg); }
+      100% { transform: translate(0, 0) rotate(0deg); }
+    }
+
+    @keyframes spinnerRotate {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes ballSpin1 {
+      0% { transform: translate(0, 0); }
+      25% { transform: translate(45px, -25px); }
+      50% { transform: translate(25px, 45px); }
+      75% { transform: translate(-35px, 15px); }
+      100% { transform: translate(0, 0); }
+    }
+    @keyframes ballSpin2 {
+      0% { transform: translate(0, 0); }
+      30% { transform: translate(-45px, 45px); }
+      60% { transform: translate(35px, -35px); }
+      85% { transform: translate(15px, 35px); }
+      100% { transform: translate(0, 0); }
+    }
+    @keyframes ballSpin3 {
+      0% { transform: translate(0, 0); }
+      20% { transform: translate(45px, 25px); }
+      45% { transform: translate(-25px, -45px); }
+      70% { transform: translate(-45px, 15px); }
+      100% { transform: translate(0, 0); }
+    }
+    @keyframes ballSpin4 {
+      0% { transform: translate(0, 0); }
+      40% { transform: translate(-25px, -45px); }
+      70% { transform: translate(35px, 15px); }
+      90% { transform: translate(-15px, 25px); }
+      100% { transform: translate(0, 0); }
+    }
+    @keyframes ballSpin5 {
+      0% { transform: translate(0, 0); }
+      25% { transform: translate(-45px, 15px); }
+      50% { transform: translate(25px, -55px); }
+      75% { transform: translate(15px, 35px); }
+      100% { transform: translate(0, 0); }
+    }
+    @keyframes ballSpin6 {
+      0% { transform: translate(0, 0); }
+      35% { transform: translate(40px, -30px); }
+      65% { transform: translate(-30px, 20px); }
+      80% { transform: translate(10px, -10px); }
+      100% { transform: translate(0, 0); }
+    }
+    @keyframes ballSpin7 {
+      0% { transform: translate(0, 0); }
+      15% { transform: translate(-20px, -40px); }
+      50% { transform: translate(30px, 30px); }
+      75% { transform: translate(-10px, -10px); }
+      100% { transform: translate(0, 0); }
+    }
+    @keyframes ballSpin8 {
+      0% { transform: translate(0, 0); }
+      30% { transform: translate(50px, -10px); }
+      55% { transform: translate(-10px, -50px); }
+      80% { transform: translate(10px, 40px); }
+      100% { transform: translate(0, 0); }
+    }
+    @keyframes ballSpin9 {
+      0% { transform: translate(0, 0); }
+      25% { transform: translate(-30px, 30px); }
+      60% { transform: translate(40px, -20px); }
+      85% { transform: translate(-10px, -30px); }
+      100% { transform: translate(0, 0); }
+    }
+    @keyframes ballSpin10 {
+      0% { transform: translate(0, 0); }
+      45% { transform: translate(-10px, 50px); }
+      75% { transform: translate(30px, -30px); }
+      90% { transform: translate(-40px, -10px); }
+      100% { transform: translate(0, 0); }
+    }
+
+    /* Result Row */
+    .results-container {
+      margin: 16px 0;
+      padding: 18px;
+      background: rgba(15, 23, 42, 0.4);
+      border-radius: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+    }
+
+    .balls-row {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+      min-height: 60px;
+      flex-wrap: wrap;
+    }
+
+    .ball-placeholder {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      border: 2px dashed rgba(255, 255, 255, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+      font-size: 1.1rem;
+      font-weight: 600;
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    /* Lotto Ball design */
+    .lotto-ball {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      font-weight: 900;
+      color: #ffffff;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.45);
+      position: relative;
+      box-shadow: 
+        inset -4px -4px 8px rgba(0,0,0,0.4),
+        inset 4px 4px 6px rgba(255,255,255,0.22),
+        0 6px 12px var(--shadow-color);
+      animation: ballDrop 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.2) both;
+    }
+
+    .lotto-ball::before {
+      content: '';
+      position: absolute;
+      top: 6px;
+      left: 6px;
+      width: 13px;
+      height: 13px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.28);
+      filter: blur(0.5px);
+    }
+
+    .ball-y { background: radial-gradient(circle at 30% 30%, var(--ball-y-1) 0%, var(--ball-y-2) 100%); --shadow-color: var(--ball-y-shadow); }
+    .ball-b { background: radial-gradient(circle at 30% 30%, var(--ball-b-1) 0%, var(--ball-b-2) 100%); --shadow-color: var(--ball-b-shadow); }
+    .ball-r { background: radial-gradient(circle at 30% 30%, var(--ball-r-1) 0%, var(--ball-r-2) 100%); --shadow-color: var(--ball-r-shadow); }
+    .ball-g { background: radial-gradient(circle at 30% 30%, var(--ball-g-1) 0%, var(--ball-g-2) 100%); --shadow-color: var(--ball-g-shadow); }
+    .ball-gr { background: radial-gradient(circle at 30% 30%, var(--ball-gr-1) 0%, var(--ball-gr-2) 100%); --shadow-color: var(--ball-gr-shadow); }
+
+    @keyframes ballDrop {
+      0% {
+        transform: translateY(-50px) scale(0.4) rotate(-180deg);
+        opacity: 0;
+      }
+      60% {
+        transform: translateY(8px) scale(1.08) rotate(15deg);
+      }
+      100% {
+        transform: translateY(0) scale(1) rotate(0);
+        opacity: 1;
+      }
+    }
+
+    /* Controls */
+    .draw-controls {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .game-count-selector {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(15, 23, 42, 0.35);
+      padding: 10px 18px;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+    }
+
+    .game-count-selector label {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 6px;
+    }
+
+    .btn-select {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--text-muted);
+      padding: 6px 14px;
+      border-radius: 10px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-select:hover {
+      background: rgba(255, 255, 255, 0.09);
+      color: #ffffff;
+    }
+
+    .btn-select.active {
+      background: rgba(99, 102, 241, 0.2);
+      border-color: var(--color-primary);
+      color: #ffffff;
+      box-shadow: 0 0 10px rgba(99, 102, 241, 0.2);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--color-primary) 0%, #4f46e5 100%);
+      border: none;
+      color: #ffffff;
+      padding: 18px;
+      border-radius: 16px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 8px 20px var(--color-primary-glow);
+      transition: transform 0.12s, box-shadow 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .btn-primary:hover {
+      box-shadow: 0 10px 24px rgba(99, 102, 241, 0.55);
+      transform: translateY(-2px);
+    }
+
+    .btn-primary:active {
+      transform: translateY(1px);
+      box-shadow: 0 4px 12px var(--color-primary-glow);
+    }
+
+    .btn-primary:disabled {
+      background: #334155;
+      color: #64748b;
+      cursor: not-allowed;
+      box-shadow: none;
+      transform: none;
+    }
+
+    .btn-primary .btn-glow {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transform: translateX(-100%);
+      transition: none;
+    }
+
+    .btn-primary:hover .btn-glow {
+      transform: translateX(100%);
+      transition: transform 0.8s ease-in-out;
+    }
+
+    /* Multi Tickets Grid styling */
+    .tickets-container {
+      margin-top: 18px;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      padding-top: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      animation: fadeIn 0.4s ease-out;
+    }
+
+    .ticket-row {
+      background: rgba(15, 23, 42, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      border-radius: 14px;
+      padding: 12px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+      transition: border-color 0.2s;
+    }
+
+    .ticket-row:hover {
+      border-color: rgba(255, 255, 255, 0.08);
+      background: rgba(15, 23, 42, 0.4);
+    }
+
+    .ticket-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .ticket-label {
+      background: #1e293b;
+      border: 1px solid rgba(255,255,255,0.08);
+      color: #94a3b8;
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+
+    .ticket-balls {
+      display: flex;
+      gap: 6px;
+    }
+
+    .ticket-ball-mini {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 800;
+      color: #ffffff;
+      box-shadow: inset -2px -2px 3px rgba(0,0,0,0.3);
+    }
+
+    .ticket-stats {
+      display: flex;
+      gap: 8px;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .copy-ticket-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 0.8rem;
+      padding: 4px 8px;
+      border-radius: 6px;
+      transition: color 0.2s, background-color 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .copy-ticket-btn:hover {
+      color: #ffffff;
+      background: rgba(255,255,255,0.05);
+    }
+
+    /* Right column: Settings & stats details */
+    .settings-station {
+      justify-content: flex-start;
+    }
+
+    .tabs-header {
+      display: flex;
+      background: rgba(15, 23, 42, 0.45);
+      padding: 4px;
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .tab-btn {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 10px 0;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      border-radius: 10px;
+      transition: all 0.25s;
+    }
+
+    .tab-btn:hover {
+      color: #ffffff;
+    }
+
+    .tab-btn.active {
+      background: var(--bg-secondary);
+      color: #ffffff;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    }
+
+    .tab-content {
+      display: none;
+      min-height: 140px;
+      animation: fadeIn 0.3s ease-out;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .info-box {
+      background: rgba(99, 102, 241, 0.06);
+      border: 1px dashed rgba(99, 102, 241, 0.2);
+      border-radius: 16px;
+      padding: 18px;
+      color: #cbd5e1;
+      font-size: 0.88rem;
+      line-height: 1.6;
+    }
+
+    .dream-box {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .dream-box label {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: #cbd5e1;
+    }
+
+    .input-group {
+      display: flex;
+      gap: 8px;
+    }
+
+    .input-group input {
+      flex: 1;
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid var(--glass-border);
+      border-radius: 12px;
+      padding: 12px 16px;
+      color: #ffffff;
+      font-family: inherit;
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .input-group input:focus {
+      border-color: var(--color-primary);
+      box-shadow: 0 0 10px rgba(99,102,241,0.15);
+    }
+
+    .btn-sub {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255,255,255,0.08);
+      color: #ffffff;
+      padding: 0 16px;
+      border-radius: 12px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-sub:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255,255,255,0.15);
+    }
+
+    .btn-sub.active {
+      background: rgba(34, 211, 238, 0.12);
+      border-color: var(--color-accent);
+      color: #22d3ee;
+    }
+
+    .dream-hint {
+      font-size: 0.76rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    /* Filter numbers grid */
+    .filter-box {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .filter-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .filter-header h3 {
+      font-size: 0.95rem;
+      color: #ffffff;
+    }
+
+    .filter-count {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .filter-count span {
+      font-weight: 600;
+    }
+
+    .filter-count #includeCount { color: var(--color-accent); }
+    .filter-count #excludeCount { color: var(--color-danger); }
+
+    .filter-desc {
+      font-size: 0.76rem;
+      color: var(--text-muted);
+    }
+
+    .filter-controls {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+
+    .filter-controls .btn-sub {
+      padding: 6px 12px;
+      font-size: 0.8rem;
+    }
+
+    .btn-text-only {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 0.8rem;
+      text-decoration: underline;
+      padding: 4px;
+      margin-left: auto;
+      transition: color 0.2s;
+    }
+
+    .btn-text-only:hover {
+      color: #ffffff;
+    }
+
+    .number-grid {
+      display: grid;
+      grid-template-columns: repeat(9, 1fr);
+      gap: 5px;
+      background: rgba(15, 23, 42, 0.45);
+      padding: 10px;
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+    }
+
+    .num-btn {
+      aspect-ratio: 1;
+      background: rgba(15, 23, 42, 0.5);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 8px;
+      color: #cbd5e1;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s;
+    }
+
+    .num-btn:hover {
+      border-color: rgba(255,255,255,0.18);
+      color: #ffffff;
+    }
+
+    .num-btn.included {
+      background: rgba(34, 211, 238, 0.15) !important;
+      border-color: var(--color-accent) !important;
+      color: #22d3ee !important;
+      box-shadow: 0 0 8px rgba(34, 211, 238, 0.2);
+    }
+
+    .num-btn.excluded {
+      background: rgba(239, 68, 68, 0.12) !important;
+      border-color: var(--color-danger) !important;
+      color: #ef4444 !important;
+      text-decoration: line-through;
+      opacity: 0.6;
+    }
+
+    /* Stats Panel */
+    .stats-panel {
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      padding-top: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .stats-panel h3 {
+      font-size: 0.95rem;
+      color: #ffffff;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    .stat-card {
+      background: rgba(15, 23, 42, 0.35);
+      border: 1px solid rgba(255, 255, 255, 0.03);
+      padding: 10px 8px;
+      border-radius: 12px;
+      text-align: center;
+    }
+
+    .stat-label {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .stat-value {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    .stat-sub {
+      font-size: 0.66rem;
+      color: #a5b4fc;
+      margin-top: 4px;
+    }
+
+    /* History Logs section */
+    .history-section {
+      margin-top: 8px;
+    }
+
+    .history-list-wrapper {
+      min-height: 80px;
+    }
+
+    .no-history {
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      padding: 30px 0;
+    }
+
+    .history-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-height: 280px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    .history-list::-webkit-scrollbar {
+      width: 5px;
+    }
+    .history-list::-webkit-scrollbar-track {
+      background: rgba(255,255,255,0.02);
+      border-radius: 10px;
+    }
+    .history-list::-webkit-scrollbar-thumb {
+      background: rgba(255,255,255,0.1);
+      border-radius: 10px;
+    }
+    .history-list::-webkit-scrollbar-thumb:hover {
+      background: rgba(255,255,255,0.2);
+    }
+
+    .history-item {
+      background: rgba(15, 23, 42, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      border-radius: 16px;
+      padding: 14px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+      animation: slideIn 0.3s ease-out;
+    }
+
+    .history-item-left {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .history-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.72rem;
+      color: var(--text-muted);
+    }
+
+    .history-badge {
+      font-size: 0.65rem;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+      padding: 1px 6px;
+      border-radius: 4px;
+      color: #cbd5e1;
+    }
+
+    .history-games {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .history-game-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .history-item-right {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn-icon {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      color: var(--text-muted);
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-icon:hover {
+      background: rgba(255, 255, 255, 0.09);
+      color: #ffffff;
+      border-color: rgba(255, 255, 255, 0.15);
+    }
+
+    .btn-icon.delete-btn:hover {
+      background: rgba(239, 68, 68, 0.15);
+      border-color: rgba(239, 68, 68, 0.25);
+      color: #ef4444;
+    }
+
+    /* Footer styling */
+    .app-footer {
+      text-align: center;
+      margin-top: 10px;
+      padding: 10px 0;
+      color: #475569;
+      font-size: 0.8rem;
+    }
+
+    /* Animations helper definitions */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(-10px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-6px); }
+    }
+  </style>
+</head>
+<body>
+  <!-- Starfield background pattern -->
+  <div class="stars-bg"></div>
+
+  <!-- Ambient background glow paths -->
+  <div class="glow-orb orb-1"></div>
+  <div class="glow-orb orb-2"></div>
+  <div class="glow-orb orb-3"></div>
+
+  <div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="logo">
+        <span class="logo-icon">🎰</span>
+        <h1>LUCKY 6/45</h1>
+      </div>
+      <p class="subtitle">프리미엄 로또 번호 추첨 & 시뮬레이터</p>
+    </header>
+
+    <!-- Main Workspace Grid -->
+    <div class="main-grid">
+      
+      <!-- Drawing Station -->
+      <main class="card drawing-station">
+        <div class="card-header">
+          <h2>로또 번호 추첨기</h2>
+          <span class="badge" id="modeBadge">자동 생성</span>
+        </div>
+
+        <!-- SVG Lottery Cage Simulator -->
+        <div class="cage-wrapper">
+          <div class="lottery-cage" id="lotteryCage">
+            <div class="cage-glass"></div>
+            <div class="cage-balls-container" id="cageBalls">
+              <!-- Decorative balls that spin inside the cage -->
+              <span class="cage-ball"></span>
+              <span class="cage-ball"></span>
+              <span class="cage-ball"></span>
+              <span class="cage-ball"></span>
+              <span class="cage-ball"></span>
+              <span class="cage-ball"></span>
+              <span class="cage-ball"></span>
+              <span class="cage-ball"></span>
+              <span class="cage-ball"></span>
+              <span class="cage-ball"></span>
+              <span class="cage-ball"></span>
+              <span class="cage-ball"></span>
+              <span class="cage-ball"></span>
+              <span class="cage-ball"></span>
+              <span class="cage-ball"></span>
+            </div>
+            <div class="cage-center-spinner"></div>
+          </div>
+          <div class="cage-pedestal"></div>
+        </div>
+
+        <!-- Render Target for Main drawn numbers -->
+        <div class="results-container">
+          <div class="balls-row" id="drawnBallsRow">
+            <span class="ball-placeholder">?</span>
+            <span class="ball-placeholder">?</span>
+            <span class="ball-placeholder">?</span>
+            <span class="ball-placeholder">?</span>
+            <span class="ball-placeholder">?</span>
+            <span class="ball-placeholder">?</span>
+          </div>
+        </div>
+
+        <!-- Control triggers -->
+        <div class="draw-controls">
+          <div class="game-count-selector">
+            <label>발행 게임 수</label>
+            <div class="btn-group" id="ticketCountGroup">
+              <button class="btn-select active" data-count="1">1 게임</button>
+              <button class="btn-select" data-count="3">3 게임</button>
+              <button class="btn-select" data-count="5">5 게임</button>
+            </div>
+          </div>
+
+          <button class="btn-primary" id="btnDraw">
+            <span class="btn-text">행운의 번호 추첨하기</span>
+            <span class="btn-glow"></span>
+          </button>
+        </div>
+
+        <!-- Multi-ticket slip container (rendered post-draw) -->
+        <div class="tickets-container" id="ticketsContainer" style="display: none;"></div>
+      </main>
+
+      <!-- Advanced Configuration & Stats Station -->
+      <section class="card settings-station">
+        <!-- Tabbed Navigation controllers -->
+        <nav class="tabs-header">
+          <button class="tab-btn active" data-tab="tab-auto" id="tabBtnAuto">⚡ 자동</button>
+          <button class="tab-btn" data-tab="tab-dream" id="tabBtnDream">🔮 꿈 분석</button>
+          <button class="tab-btn" data-tab="tab-filter" id="tabBtnFilter">⚙️ 필터 설정</button>
+        </nav>
+
+        <!-- Tab 1: Auto Gen Info -->
+        <div class="tab-content active" id="tab-auto">
+          <div class="info-box">
+            <p><strong>자동 추천 모드</strong>는 수학적 난수 생성 방식(Knuth-Fisher-Yates Shuffle)에 근거해 1부터 45까지의 숫자 중 6개의 숫자를 완벽하게 무작위로 추출합니다.<br /><br />아래의 '행운의 번호 추첨하기' 버튼을 눌러 바로 추첨을 진행해 보세요.</p>
+          </div>
+        </div>
+
+        <!-- Tab 2: Dream keyword analysis generator -->
+        <div class="tab-content" id="tab-dream">
+          <div class="dream-box">
+            <label for="dreamInput">어젯밤 꿈이나 행운의 단어를 입력하세요</label>
+            <div class="input-group">
+              <input type="text" id="dreamInput" placeholder="예: 황금 돼지, 번개, 조상님..." maxlength="25" />
+              <button class="btn-sub" id="btnDreamApply">적용</button>
+            </div>
+            <p class="dream-hint">※ 입력된 단어의 글자 해시를 추출하여 일관된 고유 번호를 생성합니다. 나만의 특별한 단어를 통해 고정된 행운의 숫자를 뽑아보세요.</p>
+          </div>
+        </div>
+
+        <!-- Tab 3: Custom number fixed/excluded grids -->
+        <div class="tab-content" id="tab-filter">
+          <div class="filter-box">
+            <div class="filter-header">
+              <h3>포함/제외 번호 선택</h3>
+              <div class="filter-count">
+                <span id="includeCount">0</span>/5 포함 | <span id="excludeCount">0</span>/5 제외
+              </div>
+            </div>
+            <p class="filter-desc">고정하고 싶은 번호(포함수)와 나오지 않길 바라는 번호(제외수)를 각각 최대 5개까지 설정할 수 있습니다.</p>
+            
+            <div class="filter-controls">
+              <button class="btn-sub active" id="filterModeInclude">고정수 선택</button>
+              <button class="btn-sub" id="filterModeExclude">제외수 선택</button>
+              <button class="btn-text-only" id="btnFilterReset">초기화</button>
+            </div>
+
+            <!-- Number grids (1 - 45) -->
+            <div class="number-grid" id="filterGrid"></div>
+          </div>
+        </div>
+
+        <!-- Stats Panel Widget -->
+        <div class="stats-panel">
+          <h3>추첨된 게임 분석 (첫 번째 게임 기준)</h3>
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-label">홀짝 비율</div>
+              <div class="stat-value" id="statOddEven">- : -</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">번호 합계</div>
+              <div class="stat-value" id="statSum">-</div>
+              <div class="stat-sub" id="statSumRange">-</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">고저 비율 (23 기준)</div>
+              <div class="stat-value" id="statLowHigh">- : -</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- History Panel -->
+    <section class="card history-section">
+      <div class="card-header">
+        <h2>최근 추첨 내역 (최대 15개)</h2>
+        <button class="btn-text-only" id="btnClearHistory" style="display: none;">내역 전체 삭제</button>
+      </div>
+      <div class="history-list-wrapper">
+        <div class="no-history" id="noHistoryMsg">아직 추첨 내역이 없습니다. 새로운 조합을 생성해 보세요!</div>
+        <div class="history-list" id="historyList"></div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      <p>© 2026 LUCKY 6/45. 본 시스템은 오락 목적의 무작위 추첨기이며, 실제 로또 당첨 확률과는 관계가 없습니다.</p>
+    </footer>
+  </div>
+
+  <!-- Javascript Core Logic -->
+  <script>
+    // Constants
+    const STORAGE_KEY = 'lotto_history_records';
+    const MAX_HISTORY_ITEMS = 15;
+
+    // App state
+    let state = {
+      activeTab: 'tab-auto', // tab-auto, tab-dream, tab-filter
+      ticketCount: 1, // 1, 3, 5 games
+      dreamKeyword: '',
+      isDrawing: false,
+      
+      // Filter values
+      filterSelectionMode: 'include', // include, exclude
+      includedNumbers: [],
+      excludedNumbers: [],
+      
+      // History log
+      history: []
+    };
+
+    // DOM Elements
+    const elements = {
+      lotteryCage: document.getElementById('lotteryCage'),
+      btnDraw: document.getElementById('btnDraw'),
+      drawnBallsRow: document.getElementById('drawnBallsRow'),
+      ticketCountGroup: document.getElementById('ticketCountGroup'),
+      ticketsContainer: document.getElementById('ticketsContainer'),
+      modeBadge: document.getElementById('modeBadge'),
+      
+      // Tabs
+      tabBtns: document.querySelectorAll('.tab-btn'),
+      tabContents: document.querySelectorAll('.tab-content'),
+      
+      // Dream Input
+      dreamInput: document.getElementById('dreamInput'),
+      btnDreamApply: document.getElementById('btnDreamApply'),
+      
+      // Filters
+      filterGrid: document.getElementById('filterGrid'),
+      filterModeInclude: document.getElementById('filterModeInclude'),
+      filterModeExclude: document.getElementById('filterModeExclude'),
+      btnFilterReset: document.getElementById('btnFilterReset'),
+      includeCount: document.getElementById('includeCount'),
+      excludeCount: document.getElementById('excludeCount'),
+      
+      // Stats
+      statOddEven: document.getElementById('statOddEven'),
+      statSum: document.getElementById('statSum'),
+      statSumRange: document.getElementById('statSumRange'),
+      statLowHigh: document.getElementById('statLowHigh'),
+      
+      // History
+      historyList: document.getElementById('historyList'),
+      noHistoryMsg: document.getElementById('noHistoryMsg'),
+      btnClearHistory: document.getElementById('btnClearHistory')
+    };
+
+    // ----------------------------------------------------
+    // Audio Synthesizer via Web Audio API
+    // ----------------------------------------------------
+    let audioCtx = null;
+
+    function initAudioContext() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    // Short wooden/plastic bounce sound
+    function playBallBounceSound() {
+      try {
+        initAudioContext();
+        if (!audioCtx) return;
+
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        osc.type = 'sine';
+        // Random pitch variance for realism
+        const freq = 650 + Math.random() * 200;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.05);
+
+        gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
+
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.05);
+      } catch (e) {
+        console.warn('Audio Context unsupported or blocked');
+      }
+    }
+
+    // High pitched click when a ball is selected
+    function playBallRevealSound() {
+      try {
+        initAudioContext();
+        if (!audioCtx) return;
+
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(587.33, audioCtx.currentTime); // D5
+        osc.frequency.exponentialRampToValueAtTime(1174.66, audioCtx.currentTime + 0.12); // D6
+
+        gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.18);
+
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.18);
+      } catch (e) {
+        console.warn(e);
+      }
+    }
+
+    // Continuous rumble/hum of the lottery machine rolling
+    function startRollHumSynth() {
+      try {
+        initAudioContext();
+        if (!audioCtx) return null;
+
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        const filter = audioCtx.createBiquadFilter();
+
+        osc.connect(filter);
+        filter.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(95, audioCtx.currentTime);
+        
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(180, audioCtx.currentTime);
+
+        gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+
+        osc.start();
+        
+        // Fast pitch modulation for bouncing effect
+        const modInterval = setInterval(() => {
+          if (audioCtx && osc) {
+            osc.frequency.setValueAtTime(90 + Math.random() * 25, audioCtx.currentTime);
+            // Occasional click sounds as balls hit borders
+            if (Math.random() > 0.4) {
+              playBallBounceSound();
+            }
+          }
+        }, 85);
+
+        return {
+          stop: () => {
+            clearInterval(modInterval);
+            try {
+              gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.15);
+              osc.stop(audioCtx.currentTime + 0.16);
+            } catch(err) {}
+          }
+        };
+      } catch (e) {
+        console.warn(e);
+        return { stop: () => {} };
+      }
+    }
+
+    // Success chord chime at completion of draw
+    function playVictoryChimeSound() {
+      try {
+        initAudioContext();
+        if (!audioCtx) return;
+
+        const now = audioCtx.currentTime;
+        // Major arpeggio notes: C5, E5, G5, C6, E6
+        const arpeggio = [523.25, 659.25, 783.99, 1046.50, 1318.51];
+        
+        arpeggio.forEach((frequency, index) => {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(frequency, now + index * 0.08);
+
+          gain.gain.setValueAtTime(0, now + index * 0.08);
+          gain.gain.linearRampToValueAtTime(0.12, now + index * 0.08 + 0.03);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + index * 0.08 + 0.45);
+
+          osc.start(now + index * 0.08);
+          osc.stop(now + index * 0.08 + 0.45);
+        });
+      } catch (e) {
+        console.warn(e);
+      }
+    }
+
+    // ----------------------------------------------------
+    // Seeded Random Generator for Dream Analysis
+    // ----------------------------------------------------
+    // 128-bit hash function (cyrb128)
+    function cyrb128(str) {
+      let h1 = 1779033703, h2 = 3024733165, h3 = 3362453659, h4 = 502493201;
+      for (let i = 0, k; i < str.length; i++) {
+        k = str.charCodeAt(i);
+        h1 = h2 ^ Math.imul(h1 ^ k, 597399067);
+        h2 = h3 ^ Math.imul(h2 ^ k, 2869860233);
+        h3 = h4 ^ Math.imul(h3 ^ k, 951274213);
+        h4 = h1 ^ Math.imul(h4 ^ k, 2716044179);
+      }
+      h1 = Math.imul(h3 ^ (h1 >>> 18), 597399067);
+      h2 = Math.imul(h4 ^ (h2 >>> 22), 2869860233);
+      h3 = Math.imul(h1 ^ (h3 >>> 17), 951274213);
+      h4 = Math.imul(h2 ^ (h4 >>> 19), 2716044179);
+      return [(h1^h2^h3^h4)>>>0, (h2^h1)>>>0, (h3^h1)>>>0, (h4^h1)>>>0];
+    }
+
+    // Simple 32-bit generator (sfc32)
+    function sfc32(a, b, c, d) {
+      return function() {
+        a >>>= 0; b >>>= 0; c >>>= 0; d >>>= 0;
+        let t = (a + b) | 0;
+        a = b ^ (b >>> 9);
+        b = (c + (c << 3)) | 0;
+        c = (c << 21) | (c >>> 11);
+        d = (d + 1) | 0;
+        t = (t + d) | 0;
+        c = (c + t) | 0;
+        return (t >>> 0) / 4294967296;
+      }
+    }
+
+    // Get a seeded random generator function from string seed
+    function getSeededPrng(strSeed) {
+      const seedArray = cyrb128(strSeed);
+      return sfc32(seedArray[0], seedArray[1], seedArray[2], seedArray[3]);
+    }
+
+    // ----------------------------------------------------
+    // Core Lotto Drawing Logic
+    // ----------------------------------------------------
+    
+    // Sort and map number to Lotto class & styling
+    function getBallClass(num) {
+      if (num <= 10) return 'ball-y'; // 1-10 yellow
+      if (num <= 20) return 'ball-b'; // 11-20 blue
+      if (num <= 30) return 'ball-r'; // 21-30 red
+      if (num <= 40) return 'ball-g'; // 31-40 gray
+      return 'ball-gr';               // 41-45 green
+    }
+
+    // Master Generator for a single game
+    function generateGame(includes, excludes, prng = Math.random) {
+      const drawn = [...includes];
+      const needed = 6 - includes.length;
+      
+      if (needed > 0) {
+        // Build selection pool excluding includes/excludes
+        const pool = [];
+        for (let i = 1; i <= 45; i++) {
+          if (!includes.includes(i) && !excludes.includes(i)) {
+            pool.push(i);
+          }
+        }
+
+        // Safety fallback if rules leave too few numbers
+        if (pool.length < needed) {
+          // Re-add excludes to make it work
+          for (let i = 1; i <= 45; i++) {
+            if (!includes.includes(i) && !pool.includes(i)) {
+              pool.push(i);
+            }
+          }
+        }
+
+        // Knuth-Fisher-Yates Shuffle
+        for (let i = pool.length - 1; i > 0; i--) {
+          const j = Math.floor(prng() * (i + 1));
+          [pool[i], pool[j]] = [pool[j], pool[i]];
+        }
+
+        // Draw necessary count
+        for (let i = 0; i < needed; i++) {
+          drawn.push(pool[i]);
+        }
+      }
+
+      return drawn.sort((a, b) => a - b);
+    }
+
+    // Generate ticket batch list (1, 3, or 5 games)
+    function generateGameBatch() {
+      let prng = Math.random;
+      
+      // If Dream mode is active and word input exists, generate seeded PRNG
+      if (state.activeTab === 'tab-dream' && state.dreamKeyword.trim() !== '') {
+        prng = getSeededPrng(state.dreamKeyword.trim());
+      }
+
+      const batch = [];
+      for (let g = 0; g < state.ticketCount; g++) {
+        // First game respects active includes/excludes filters
+        // Remaining games are generated completely auto to provide a full ticket
+        if (g === 0) {
+          batch.push(generateGame(state.includedNumbers, state.excludedNumbers, prng));
+        } else {
+          batch.push(generateGame([], [], prng));
+        }
+      }
+      return batch;
+    }
+
+    // ----------------------------------------------------
+    // User Interface Render Actions
+    // ----------------------------------------------------
+
+    // Initialize 1-45 Filter Number grid
+    function renderFilterGrid() {
+      elements.filterGrid.innerHTML = '';
+      for (let i = 1; i <= 45; i++) {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'num-btn';
+        btn.textContent = i;
+        btn.id = `filterNum-${i}`;
+        
+        // Add active classes based on state
+        if (state.includedNumbers.includes(i)) {
+          btn.classList.add('included');
+        } else if (state.excludedNumbers.includes(i)) {
+          btn.classList.add('excluded');
+        }
+
+        btn.addEventListener('click', () => handleFilterClick(i));
+        elements.filterGrid.appendChild(btn);
+      }
+      updateFilterSummaryDisplay();
+    }
+
+    // Handle single grid item clicking
+    function handleFilterClick(num) {
+      initAudioContext();
+      playBallBounceSound();
+
+      if (state.filterSelectionMode === 'include') {
+        // Include Mode
+        if (state.includedNumbers.includes(num)) {
+          // Remove if selected
+          state.includedNumbers = state.includedNumbers.filter(n => n !== num);
+        } else {
+          // Add if limits are safe
+          if (state.includedNumbers.length >= 5) {
+            alert('고정수는 최대 5개까지 선택할 수 있습니다.');
+            return;
+          }
+          // Remove from excludes if exists
+          state.excludedNumbers = state.excludedNumbers.filter(n => n !== num);
+          state.includedNumbers.push(num);
+        }
+      } else {
+        // Exclude Mode
+        if (state.excludedNumbers.includes(num)) {
+          // Remove if selected
+          state.excludedNumbers = state.excludedNumbers.filter(n => n !== num);
+        } else {
+          // Add if limits are safe
+          if (state.excludedNumbers.length >= 5) {
+            alert('제외수는 최대 5개까지 선택할 수 있습니다.');
+            return;
+          }
+          // Remove from includes if exists
+          state.includedNumbers = state.includedNumbers.filter(n => n !== num);
+          state.excludedNumbers.push(num);
+        }
+      }
+
+      renderFilterGrid();
+    }
+
+    // Clean all grid selections
+    function resetFilters() {
+      state.includedNumbers = [];
+      state.excludedNumbers = [];
+      renderFilterGrid();
+    }
+
+    function updateFilterSummaryDisplay() {
+      elements.includeCount.textContent = state.includedNumbers.length;
+      elements.excludeCount.textContent = state.excludedNumbers.length;
+    }
+
+    // Show stats logic
+    function calculateAndDisplayStats(balls) {
+      if (!balls || balls.length !== 6) return;
+
+      // 1. Odd : Even
+      let odd = 0;
+      let even = 0;
+      balls.forEach(n => {
+        if (n % 2 === 0) even++;
+        else odd++;
+      });
+      elements.statOddEven.textContent = `${odd} : ${even}`;
+
+      // 2. Sum
+      const sum = balls.reduce((acc, curr) => acc + curr, 0);
+      elements.statSum.textContent = sum;
+      
+      // Korean Lotto sum normally peaks between 120 and 180
+      let rating = '보통';
+      if (sum >= 120 && sum <= 180) {
+        rating = '안정적 (120~180)';
+        elements.statSumRange.style.color = 'var(--color-success)';
+      } else {
+        rating = '특이 조합';
+        elements.statSumRange.style.color = '#fb7185';
+      }
+      elements.statSumRange.textContent = rating;
+
+      // 3. Low vs High (Split border at 23)
+      let low = 0;
+      let high = 0;
+      balls.forEach(n => {
+        if (n <= 22) low++;
+        else high++;
+      });
+      elements.statLowHigh.textContent = `${low} : ${high}`;
+    }
+
+    // Draw trigger execution animation flow
+    function executeDrawingFlow() {
+      if (state.isDrawing) return;
+      state.isDrawing = true;
+
+      // 1. Refresh audio and block draw controls
+      initAudioContext();
+      elements.btnDraw.disabled = true;
+      elements.ticketsContainer.style.display = 'none';
+
+      // Reset main row to placeholder state
+      elements.drawnBallsRow.innerHTML = `
+        <span class="ball-placeholder">?</span>
+        <span class="ball-placeholder">?</span>
+        <span class="ball-placeholder">?</span>
+        <span class="ball-placeholder">?</span>
+        <span class="ball-placeholder">?</span>
+        <span class="ball-placeholder">?</span>
+      `;
+
+      // Start cage rotation + rumble hum synth
+      elements.lotteryCage.classList.add('spinning');
+      const humSynth = startRollHumSynth();
+
+      // Complete batch results data structure
+      const gameBatch = generateGameBatch();
+      const primaryGame = gameBatch[0]; // Used for individual sequential drops
+
+      // 2. Spin timeout
+      setTimeout(() => {
+        // Stop mechanical sound, release cage
+        if (humSynth) humSynth.stop();
+        elements.lotteryCage.classList.remove('spinning');
+
+        // Reveal sequence delay scheduler
+        elements.drawnBallsRow.innerHTML = '';
+        
+        primaryGame.forEach((number, index) => {
+          setTimeout(() => {
+            const ball = document.createElement('span');
+            ball.className = `lotto-ball ${getBallClass(number)}`;
+            ball.textContent = number;
+            
+            // Append with trigger sound
+            elements.drawnBallsRow.appendChild(ball);
+            playBallRevealSound();
+
+            // When last ball reveals, launch finalization actions
+            if (index === primaryGame.length - 1) {
+              setTimeout(() => {
+                playVictoryChimeSound();
+                finalizeDraw(gameBatch);
+              }, 400);
+            }
+          }, index * 350);
+        });
+
+      }, 2000);
+    }
+
+    // End drawing state, show multi tickets, update history & statistics
+    function finalizeDraw(batch) {
+      state.isDrawing = false;
+      elements.btnDraw.disabled = false;
+
+      // Render stats for the primary game
+      calculateAndDisplayStats(batch[0]);
+
+      // If multi game is selected (3 or 5), reveal other tickets
+      renderTicketsTable(batch);
+
+      // Save to logs
+      saveRecordToHistory(batch);
+    }
+
+    // Display multi game rows on screen
+    function renderTicketsTable(batch) {
+      elements.ticketsContainer.innerHTML = '';
+      
+      if (batch.length <= 1) {
+        elements.ticketsContainer.style.display = 'none';
+        return;
+      }
+
+      elements.ticketsContainer.style.display = 'flex';
+      
+      batch.forEach((game, index) => {
+        const row = document.createElement('div');
+        row.className = 'ticket-row';
+
+        // Label designation (A, B, C, D, E)
+        const label = String.fromCharCode(65 + index); // A, B, C...
+
+        // Build HTML content inside row
+        let ballsHtml = '';
+        game.forEach(n => {
+          ballsHtml += `<span class="ticket-ball-mini ${getBallClass(n)}">${n}</span>`;
+        });
+
+        // Compute local odds/even & sum stats
+        let odds = 0; game.forEach(n => { if(n % 2 !== 0) odds++; });
+        const sum = game.reduce((a,b) => a+b, 0);
+
+        row.innerHTML = `
+          <div class="ticket-info">
+            <span class="ticket-label">${label}</span>
+            <div class="ticket-balls">${ballsHtml}</div>
+          </div>
+          <div class="ticket-stats">
+            <span>합계: <strong>${sum}</strong></span>
+            <span>홀짝: <strong>${odds}:${6-odds}</strong></span>
+          </div>
+          <button class="copy-ticket-btn" onclick="copyIndividualGameText('${label}', [${game.join(',')}])">
+            📋 복사
+          </button>
+        `;
+        
+        elements.ticketsContainer.appendChild(row);
+      });
+    }
+
+    // Copy single game ticket line as text
+    window.copyIndividualGameText = function(label, gameArray) {
+      initAudioContext();
+      playBallBounceSound();
+      const text = `게임 ${label}: ${gameArray.join(', ')}`;
+      navigator.clipboard.writeText(text).then(() => {
+        alert(`${text} 복사 완료!`);
+      });
+    };
+
+    // ----------------------------------------------------
+    // History Persistence & Storage
+    // ----------------------------------------------------
+    
+    function loadHistoryFromStorage() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          state.history = JSON.parse(raw);
+        }
+      } catch (e) {
+        console.warn('Storage reading failed', e);
+      }
+      renderHistoryList();
+    }
+
+    function saveRecordToHistory(batch) {
+      // Build log description details
+      let modeText = '자동';
+      if (state.activeTab === 'tab-dream') {
+        const text = state.dreamKeyword.trim();
+        modeText = `꿈(${text.length > 5 ? text.substring(0, 5) + '..' : text})`;
+      } else if (state.activeTab === 'tab-filter' && (state.includedNumbers.length > 0 || state.excludedNumbers.length > 0)) {
+        modeText = `필터(포함:${state.includedNumbers.length}, 제외:${state.excludedNumbers.length})`;
+      }
+
+      const timestamp = new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      
+      const record = {
+        id: Date.now(),
+        time: timestamp,
+        mode: modeText,
+        games: batch
+      };
+
+      // Add to front of log array
+      state.history.unshift(record);
+
+      // Cap size limit
+      if (state.history.length > MAX_HISTORY_ITEMS) {
+        state.history.pop();
+      }
+
+      // Sync local storage
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state.history));
+      } catch (e) {
+        console.warn('History save fail', e);
+      }
+
+      renderHistoryList();
+    }
+
+    function deleteHistoryItem(id) {
+      initAudioContext();
+      playBallBounceSound();
+      
+      state.history = state.history.filter(item => item.id !== id);
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state.history));
+      } catch(e) {}
+      renderHistoryList();
+    }
+
+    function clearAllHistory() {
+      if (!confirm('추첨 이력을 모두 삭제하시겠습니까?')) return;
+      initAudioContext();
+      playBallRevealSound();
+      state.history = [];
+      try {
+        localStorage.removeItem(STORAGE_KEY);
+      } catch(e) {}
+      renderHistoryList();
+    }
+
+    // Render list elements to UI
+    function renderHistoryList() {
+      elements.historyList.innerHTML = '';
+      
+      if (state.history.length === 0) {
+        elements.noHistoryMsg.style.display = 'block';
+        elements.historyList.style.display = 'none';
+        elements.btnClearHistory.style.display = 'none';
+        return;
+      }
+
+      elements.noHistoryMsg.style.display = 'none';
+      elements.historyList.style.display = 'flex';
+      elements.btnClearHistory.style.display = 'inline-block';
+
+      state.history.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'history-item';
+
+        // Render details
+        let gamesHtml = '';
+        item.games.forEach((game, idx) => {
+          const gameLabel = String.fromCharCode(65 + idx);
+          let ballsHtml = '';
+          game.forEach(n => {
+            ballsHtml += `<span class="ticket-ball-mini ${getBallClass(n)}">${n}</span>`;
+          });
+          gamesHtml += `
+            <div class="history-game-row">
+              <span class="ticket-label">${gameLabel}</span>
+              <div class="ticket-balls">${ballsHtml}</div>
+            </div>
+          `;
+        });
+
+        // Create copy format
+        const copyText = item.games.map((g, i) => `${String.fromCharCode(65 + i)}: ${g.join(', ')}`).join('\n');
+
+        div.innerHTML = `
+          <div class="history-item-left">
+            <div class="history-meta">
+              <span class="badge">${item.mode}</span>
+              <span>시간: ${item.time}</span>
+              <span>(${item.games.length}개 게임)</span>
+            </div>
+            <div class="history-games">
+              ${gamesHtml}
+            </div>
+          </div>
+          <div class="history-item-right">
+            <button class="btn-icon" title="복사" onclick="copyTextToClipboard(\`${copyText}\`)">
+              📋
+            </button>
+            <button class="btn-icon delete-btn" title="삭제" onclick="deleteHistoryItem(${item.id})">
+              🗑️
+            </button>
+          </div>
+        `;
+
+        elements.historyList.appendChild(div);
+      });
+    }
+
+    // Clipboard copy helper
+    window.copyTextToClipboard = function(text) {
+      initAudioContext();
+      playBallRevealSound();
+      navigator.clipboard.writeText(text).then(() => {
+        alert('조합 내역 복사 완료!');
+      });
+    };
+
+    // ----------------------------------------------------
+    // User Action Event Listeners
+    // ----------------------------------------------------
+    
+    // Tab switching event controller
+    elements.tabBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        initAudioContext();
+        playBallBounceSound();
+
+        const targetTab = btn.getAttribute('data-tab');
+        state.activeTab = targetTab;
+
+        // Visual states toggle
+        elements.tabBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        elements.tabContents.forEach(c => {
+          if (c.id === targetTab) c.classList.add('active');
+          else c.classList.remove('active');
+        });
+
+        // Sync mode badges
+        if (targetTab === 'tab-auto') {
+          elements.modeBadge.textContent = '자동 생성';
+        } else if (targetTab === 'tab-dream') {
+          elements.modeBadge.textContent = '꿈 분석 모드';
+        } else {
+          elements.modeBadge.textContent = '필터 생성 모드';
+        }
+      });
+    });
+
+    // Multi game button selection
+    elements.ticketCountGroup.querySelectorAll('.btn-select').forEach(btn => {
+      btn.addEventListener('click', () => {
+        initAudioContext();
+        playBallBounceSound();
+
+        elements.ticketCountGroup.querySelectorAll('.btn-select').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        state.ticketCount = parseInt(btn.getAttribute('data-count'), 10);
+      });
+    });
+
+    // Apply button for dream input
+    elements.btnDreamApply.addEventListener('click', () => {
+      initAudioContext();
+      playBallRevealSound();
+
+      const val = elements.dreamInput.value.trim();
+      if (!val) {
+        alert('분석을 진행할 꿈의 단어를 입력해주세요.');
+        return;
+      }
+      state.dreamKeyword = val;
+      alert(`꿈의 단어 "${val}" 설정이 적용되었습니다. 추첨 시 단어 기반으로 행운번호를 생성합니다.`);
+    });
+
+    // Filter controls configuration
+    elements.filterModeInclude.addEventListener('click', () => {
+      initAudioContext();
+      playBallBounceSound();
+      state.filterSelectionMode = 'include';
+      elements.filterModeInclude.classList.add('active');
+      elements.filterModeExclude.classList.remove('active');
+    });
+
+    elements.filterModeExclude.addEventListener('click', () => {
+      initAudioContext();
+      playBallBounceSound();
+      state.filterSelectionMode = 'exclude';
+      elements.filterModeExclude.classList.add('active');
+      elements.filterModeInclude.classList.remove('active');
+    });
+
+    elements.btnFilterReset.addEventListener('click', () => {
+      initAudioContext();
+      playBallRevealSound();
+      resetFilters();
+    });
+
+    // Main Draw click trigger
+    elements.btnDraw.addEventListener('click', executeDrawingFlow);
+
+    // History deletion triggers
+    elements.btnClearHistory.addEventListener('click', clearAllHistory);
+    window.deleteHistoryItem = deleteHistoryItem;
+
+    // Initialization call sequence
+    document.addEventListener('DOMContentLoaded', () => {
+      renderFilterGrid();
+      loadHistoryFromStorage();
+    });
+  </script>
+</body>
+</html>
