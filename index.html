@@ -1137,9 +1137,219 @@
       0%, 100% { transform: translateY(0); }
       50% { transform: translateY(-6px); }
     }
+
+    /* Theme Toggle Element */
+    .theme-toggle-container {
+      position: absolute;
+      top: 24px;
+      right: 24px;
+      z-index: 100;
+    }
+    @media (max-width: 600px) {
+      .theme-toggle-container {
+        top: 16px;
+        right: 16px;
+      }
+    }
+    .theme-toggle {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--text-main);
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 1.25rem;
+      transition: all 0.25s ease;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+    .theme-toggle:hover {
+      background: rgba(255, 255, 255, 0.12);
+      transform: scale(1.08);
+      box-shadow: 0 4px 16px rgba(99, 102, 241, 0.25);
+    }
+
+    /* Light Mode Overrides */
+    body.light-mode {
+      --bg-primary: #f1f5f9;
+      --bg-secondary: #ffffff;
+      --glass-bg: rgba(255, 255, 255, 0.72);
+      --glass-border: rgba(15, 23, 42, 0.08);
+      --glass-glow: rgba(99, 102, 241, 0.05);
+      
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+    }
+    body.light-mode .theme-toggle {
+      background: rgba(0, 0, 0, 0.04);
+      border-color: rgba(0, 0, 0, 0.08);
+      color: var(--text-main);
+    }
+    body.light-mode .theme-toggle:hover {
+      background: rgba(0, 0, 0, 0.08);
+      box-shadow: 0 4px 16px rgba(99, 102, 241, 0.15);
+    }
+    body.light-mode .stars-bg {
+      opacity: 0.03;
+      background-image: 
+        radial-gradient(#000000, rgba(0,0,0,.08) 1.5px, transparent 40px),
+        radial-gradient(#000000, rgba(0,0,0,.05) 1px, transparent 30px);
+    }
+    body.light-mode .orb-1 { background: radial-gradient(circle, rgba(99, 102, 241, 0.1) 0%, rgba(99, 102, 241, 0) 70%); }
+    body.light-mode .orb-2 { background: radial-gradient(circle, rgba(236, 72, 153, 0.08) 0%, rgba(236, 72, 153, 0) 70%); }
+    body.light-mode .orb-3 { background: radial-gradient(circle, rgba(34, 211, 238, 0.07) 0%, rgba(34, 211, 238, 0) 70%); }
+    
+    body.light-mode .card {
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06), inset 0 0 1px rgba(255,255,255,0.7);
+    }
+    body.light-mode .card-header {
+      border-color: rgba(0,0,0,0.06);
+    }
+    body.light-mode .ticket-row, 
+    body.light-mode .history-item {
+      background: rgba(255, 255, 255, 0.6);
+      border-color: rgba(0, 0, 0, 0.04);
+    }
+    body.light-mode .ticket-row:hover,
+    body.light-mode .history-item:hover {
+      background: rgba(255, 255, 255, 0.95);
+      border-color: rgba(0, 0, 0, 0.09);
+    }
+    body.light-mode .results-container {
+      background: rgba(0, 0, 0, 0.02);
+      border-color: rgba(0, 0, 0, 0.04);
+    }
+    body.light-mode .ball-placeholder {
+      background: rgba(255, 255, 255, 0.4);
+      border-color: rgba(0, 0, 0, 0.1);
+    }
+    body.light-mode .ticket-label {
+      background: #e2e8f0;
+      border-color: rgba(0,0,0,0.06);
+      color: #475569;
+    }
+    body.light-mode .btn-select {
+      background: rgba(0, 0, 0, 0.04);
+      border-color: rgba(0, 0, 0, 0.06);
+      color: #64748b;
+    }
+    body.light-mode .btn-select:hover {
+      background: rgba(0, 0, 0, 0.07);
+      color: #0f172a;
+    }
+    body.light-mode .btn-select.active {
+      background: rgba(99, 102, 241, 0.1);
+      border-color: var(--color-primary);
+      color: var(--color-primary);
+    }
+    body.light-mode .game-count-selector {
+      background: rgba(0, 0, 0, 0.02);
+      border-color: rgba(0, 0, 0, 0.04);
+    }
+    body.light-mode .tabs-header {
+      background: rgba(0, 0, 0, 0.03);
+      border-color: rgba(0, 0, 0, 0.04);
+    }
+    body.light-mode .tab-btn.active {
+      background: #ffffff;
+      color: #0f172a;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+    }
+    body.light-mode .input-group input {
+      background: #ffffff;
+      border-color: rgba(0, 0, 0, 0.08);
+      color: #0f172a;
+    }
+    body.light-mode .btn-sub {
+      background: rgba(0, 0, 0, 0.03);
+      border-color: rgba(0,0,0,0.05);
+      color: #334155;
+    }
+    body.light-mode .btn-sub:hover {
+      background: rgba(0, 0, 0, 0.06);
+    }
+    body.light-mode .btn-sub.active {
+      background: rgba(34, 211, 238, 0.1);
+      border-color: var(--color-accent);
+      color: #0891b2;
+    }
+    body.light-mode .number-grid {
+      background: rgba(0, 0, 0, 0.02);
+      border-color: rgba(0, 0, 0, 0.03);
+    }
+    body.light-mode .num-btn {
+      background: #ffffff;
+      border-color: rgba(0,0,0,0.06);
+      color: #334155;
+    }
+    body.light-mode .num-btn:hover {
+      border-color: rgba(0,0,0,0.12);
+      color: #0f172a;
+    }
+    body.light-mode .stat-card {
+      background: rgba(0, 0, 0, 0.02);
+      border-color: rgba(0, 0, 0, 0.03);
+    }
+    body.light-mode .btn-icon {
+      background: rgba(0, 0, 0, 0.02);
+      border-color: rgba(0, 0, 0, 0.04);
+    }
+    body.light-mode .btn-icon:hover {
+      background: rgba(0, 0, 0, 0.05);
+      color: #0f172a;
+    }
+    body.light-mode .logo h1 {
+      background: linear-gradient(135deg, #0f172a 30%, #4338ca 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    body.light-mode .app-header p {
+      color: #475569;
+    }
+    body.light-mode .card-header h2, 
+    body.light-mode .filter-header h3, 
+    body.light-mode .stats-panel h3,
+    body.light-mode .stat-value {
+      color: #0f172a;
+    }
+    body.light-mode .lottery-cage {
+      background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.82) 0%, rgba(226, 232, 240, 0.6) 100%);
+      border-color: rgba(0, 0, 0, 0.05);
+      box-shadow: 
+        0 15px 30px rgba(0,0,0,0.08), 
+        inset 0 0 25px rgba(99, 102, 241, 0.05);
+    }
+    body.light-mode .lottery-cage.spinning {
+      border-color: rgba(99, 102, 241, 0.35);
+      box-shadow: 
+        0 15px 30px rgba(0,0,0,0.08), 
+        0 0 20px rgba(99, 102, 241, 0.2),
+        inset 0 0 30px rgba(99, 102, 241, 0.1);
+    }
+    body.light-mode .cage-center-spinner {
+      background: rgba(255, 255, 255, 0.85);
+      border-color: rgba(0, 0, 0, 0.06);
+    }
+    body.light-mode .cage-pedestal {
+      background: linear-gradient(90deg, #e2e8f0, #cbd5e1, #e2e8f0);
+      border-color: rgba(0,0,0,0.05);
+    }
+    body.light-mode .info-box {
+      background: rgba(99, 102, 241, 0.03);
+      border-color: rgba(99, 102, 241, 0.12);
+      color: #334155;
+    }
   </style>
 </head>
 <body>
+  <!-- Theme toggle trigger button -->
+  <div class="theme-toggle-container">
+    <button class="theme-toggle" id="btnThemeToggle" title="테마 변경">☀️</button>
+  </div>
+
   <!-- Starfield background pattern -->
   <div class="stars-bg"></div>
 
@@ -1375,7 +1585,8 @@
       // History
       historyList: document.getElementById('historyList'),
       noHistoryMsg: document.getElementById('noHistoryMsg'),
-      btnClearHistory: document.getElementById('btnClearHistory')
+      btnClearHistory: document.getElementById('btnClearHistory'),
+      btnThemeToggle: document.getElementById('btnThemeToggle')
     };
 
     // ----------------------------------------------------
@@ -2130,6 +2341,29 @@
 
     // Initialization call sequence
     document.addEventListener('DOMContentLoaded', () => {
+      // Theme Toggle Init & Click Event
+      const savedTheme = localStorage.getItem('lotto_theme') || 'dark';
+      if (savedTheme === 'light') {
+        document.body.classList.add('light-mode');
+        elements.btnThemeToggle.textContent = '🌙';
+      } else {
+        elements.btnThemeToggle.textContent = '☀️';
+      }
+
+      elements.btnThemeToggle.addEventListener('click', () => {
+        initAudioContext();
+        playBallBounceSound();
+        
+        const isLight = document.body.classList.toggle('light-mode');
+        if (isLight) {
+          elements.btnThemeToggle.textContent = '🌙';
+          localStorage.setItem('lotto_theme', 'light');
+        } else {
+          elements.btnThemeToggle.textContent = '☀️';
+          localStorage.setItem('lotto_theme', 'dark');
+        }
+      });
+
       renderFilterGrid();
       loadHistoryFromStorage();
     });
