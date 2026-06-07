@@ -1646,6 +1646,28 @@
 
     </div>
 
+    <!-- Disqus Comments Card -->
+    <section class="card comments-section">
+      <div class="card-header">
+        <h2>💬 사용자 응원 및 댓글</h2>
+        <span class="badge">Disqus</span>
+      </div>
+      <div id="disqus_thread"></div>
+      <script>
+        var disqus_config = function () {
+          this.page.url = window.location.href;
+          this.page.identifier = window.location.pathname || 'lotto-index';
+        };
+        (function() {
+          var d = document, s = d.createElement('script');
+          s.src = 'https://munchhh.disqus.com/embed.js';
+          s.setAttribute('data-timestamp', +new Date());
+          (d.head || d.body).appendChild(s);
+        })();
+      </script>
+      <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </section>
+
     <!-- Footer -->
     <footer class="app-footer">
       <p>© 2026 LUCKY 6/45. 본 시스템은 오락 목적의 무작위 추첨기이며, 실제 로또 당첨 확률과는 관계가 없습니다.</p>
