@@ -1342,6 +1342,90 @@
       border-color: rgba(99, 102, 241, 0.12);
       color: #334155;
     }
+
+    /* Bottom Grid Layout */
+    .bottom-grid {
+      display: grid;
+      grid-template-columns: 1.25fr 0.95fr;
+      gap: 28px;
+    }
+    @media (max-width: 900px) {
+      .bottom-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Partnership Contact Form styling */
+    .contact-form {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .form-group label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #cbd5e1;
+      text-align: left;
+    }
+    .form-group input, 
+    .form-group select, 
+    .form-group textarea {
+      background: rgba(15, 23, 42, 0.45);
+      border: 1px solid var(--glass-border);
+      border-radius: 12px;
+      padding: 12px 16px;
+      color: #ffffff;
+      font-family: inherit;
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .form-group textarea {
+      resize: none;
+    }
+    .form-group select {
+      appearance: none;
+      -webkit-appearance: none;
+      background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 16px center;
+      background-size: 16px;
+      padding-right: 40px;
+    }
+    .form-group input:focus, 
+    .form-group select:focus, 
+    .form-group textarea:focus {
+      border-color: var(--color-primary);
+      box-shadow: 0 0 10px rgba(99,102,241,0.15);
+    }
+    .form-status {
+      font-size: 0.82rem;
+      text-align: center;
+      min-height: 20px;
+      line-height: 1.4;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+    
+    /* Light Mode Overrides for Contact Form */
+    body.light-mode .form-group label {
+      color: #334155;
+    }
+    body.light-mode .form-group input, 
+    body.light-mode .form-group select, 
+    body.light-mode .form-group textarea {
+      background: #ffffff;
+      border-color: rgba(0, 0, 0, 0.08);
+      color: #0f172a;
+    }
+    body.light-mode .form-group select {
+      background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    }
   </style>
 </head>
 <body>
@@ -1511,17 +1595,56 @@
 
     </div>
 
-    <!-- History Panel -->
-    <section class="card history-section">
-      <div class="card-header">
-        <h2>최근 추첨 내역 (최대 15개)</h2>
-        <button class="btn-text-only" id="btnClearHistory" style="display: none;">내역 전체 삭제</button>
-      </div>
-      <div class="history-list-wrapper">
-        <div class="no-history" id="noHistoryMsg">아직 추첨 내역이 없습니다. 새로운 조합을 생성해 보세요!</div>
-        <div class="history-list" id="historyList"></div>
-      </div>
-    </section>
+    <!-- Bottom Workspace Grid -->
+    <div class="bottom-grid">
+      
+      <!-- History Panel -->
+      <section class="card history-section">
+        <div class="card-header">
+          <h2>최근 추첨 내역 (최대 15개)</h2>
+          <button class="btn-text-only" id="btnClearHistory" style="display: none;">내역 전체 삭제</button>
+        </div>
+        <div class="history-list-wrapper">
+          <div class="no-history" id="noHistoryMsg">아직 추첨 내역이 없습니다. 새로운 조합을 생성해 보세요!</div>
+          <div class="history-list" id="historyList"></div>
+        </div>
+      </section>
+
+      <!-- Partnership Inquiry Panel -->
+      <section class="card contact-section">
+        <div class="card-header">
+          <h2>제휴 및 광고 문의</h2>
+          <span class="badge">Formspree</span>
+        </div>
+        <form class="contact-form" id="contactForm" action="https://formspree.io/f/xwvjlbvg" method="POST">
+          <div class="form-group">
+            <label for="contactEmail">이메일 주소</label>
+            <input type="email" id="contactEmail" name="email" required placeholder="reply@example.com" />
+          </div>
+          <div class="form-group">
+            <label for="contactType">문의 구분</label>
+            <select id="contactType" name="inquiry_type" required>
+              <option value="business">비즈니스 제휴</option>
+              <option value="ad">광고 문의</option>
+              <option value="feedback">시스템 개선 의견</option>
+              <option value="other">기타 문의</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="contactMessage">문의 내용</label>
+            <textarea id="contactMessage" name="message" required placeholder="제휴 제안 또는 문의사항 내용을 자세히 남겨주세요." rows="4"></textarea>
+          </div>
+          
+          <div class="form-status" id="contactFormStatus"></div>
+
+          <button class="btn-primary" type="submit" id="btnContactSubmit" style="padding: 12px; font-size: 0.95rem;">
+            <span class="btn-text">문의사항 보내기</span>
+            <span class="btn-glow"></span>
+          </button>
+        </form>
+      </section>
+
+    </div>
 
     <!-- Footer -->
     <footer class="app-footer">
@@ -2366,6 +2489,54 @@
 
       renderFilterGrid();
       loadHistoryFromStorage();
+
+      // Formspree Contact Form Submission Handling
+      const contactForm = document.getElementById('contactForm');
+      const contactStatus = document.getElementById('contactFormStatus');
+      const contactSubmitBtn = document.getElementById('btnContactSubmit');
+
+      if (contactForm) {
+        contactForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          initAudioContext();
+          playBallRevealSound();
+
+          contactSubmitBtn.disabled = true;
+          contactStatus.textContent = "전송 중...";
+          contactStatus.style.color = "var(--text-muted)";
+
+          const data = new FormData(e.target);
+
+          try {
+            const response = await fetch(e.target.action, {
+              method: e.target.method,
+              body: data,
+              headers: {
+                'Accept': 'application/json'
+              }
+            });
+
+            if (response.ok) {
+              contactStatus.textContent = "🎉 문의가 정상 접수되었습니다. 감사합니다!";
+              contactStatus.style.color = "var(--color-success)";
+              contactForm.reset();
+            } else {
+              const result = await response.json();
+              if (result.errors) {
+                contactStatus.textContent = result.errors.map(error => error.message).join(", ");
+              } else {
+                contactStatus.textContent = "❌ 전송 오류가 발생했습니다. 다시 시도해 주세요.";
+              }
+              contactStatus.style.color = "var(--color-danger)";
+            }
+          } catch (error) {
+            contactStatus.textContent = "❌ 네트워크 오류가 발생했습니다. 다시 시도해 주세요.";
+            contactStatus.style.color = "var(--color-danger)";
+          } finally {
+            contactSubmitBtn.disabled = false;
+          }
+        });
+      }
     });
   </script>
 </body>
